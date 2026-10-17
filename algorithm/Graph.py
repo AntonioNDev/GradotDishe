@@ -3,6 +3,8 @@ import heapq
 import csv
 from pathlib import Path
 
+ALPHAS = {"shortest": 0, "balanced": 3, "cleanest": 25}
+
 @dataclass
 class Edge:
     to: int
@@ -98,14 +100,40 @@ def show(result):
     for i, (lat, lon) in enumerate(path):
         print(f"  {i}: {lat}, {lon}")
 
-def find_route(g, start_latlon, end_latlon, alpha):
+def find_routes(g, start_latlon, end_latlon):
     start = nearest_node(g, start_latlon[0], start_latlon[1])
     goal = nearest_node(g, end_latlon[0], end_latlon[1])
-    result = dijkstra(g, start, goal, alpha)
-    if result is None:
+    print("start node:", start, "goal node:", goal)
+
+
+    shortest = dijkstra(g, start, goal, alpha=0)
+    if shortest is None:
         return None
-    path, cost = result
-    return path
+    short_path = shortest[0]
+    short_len, short_risk = path_stats(g, short_path)
+
+    result = {
+        "shortest": {"path": short_path, "length": short_len, "risk": short_risk},
+        "clean": None,
+    }
+
+    clean_path = dijkstra(g, start, goal, alpha=ALPHAS["cleanest"])[0]
+    clean_len, clean_risk = path_stats(g, clean_path)
+
+    if clean_path != short_path and clean_risk < short_risk:
+        result["clean"] = {"path": clean_path, "length": clean_len, "risk": clean_risk}
+
+    return result
+
+def path_stats(g, path):
+    length = 0.0
+    exposure = 0.0
+    for u, v in zip(path, path[1:]):
+        edge = min((e for e in g.adj[u] if e.to == v), key=lambda e: e.length)
+        length += edge.length
+        exposure += edge.length * edge.risk
+    avg_risk = exposure / length if length > 0 else 0.0
+    return length, avg_risk
 
 if __name__ == "__main__":
     BASE = Path(__file__).parent
