@@ -1,0 +1,11 @@
+# Interactive Map Widget
+tkintermapview>=1.28
+
+# Modern UI Components & Rounded Buttons
+customtkinter>=5.2.0
+
+# Image processing dependency for map markers & tiles
+Pillow>=10.0.0
+
+# HTTP Requests for API communication
+requests>=2.31.0
