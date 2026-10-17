@@ -19,12 +19,13 @@ class mainApp:
         self.marker_b = None
         self.start_coords = None
         self.end_coords = None
-        self.paths = []                 # route lines currently on the map
-        self.graph = None               # filled by the background loader
+        self.paths = []  # route lines currently on the map
+        self.graph = None  # filled by the background loader
+        self.sensor_data = None  # filled by the background loader
 
         # Pollution (debug) state
         self.pollution_layers = []
-        self.pollution_visible = True
+        self.pollution_visible = False
 
         # 3. UI
         self.appDesign()
@@ -49,7 +50,7 @@ class mainApp:
 
         self.debug_button = tk.Button(
             self.top_panel,
-            text="Hide pollution (Debug)",
+            text="Show pollution (Debug)",
             command=self.togglePollution,
             bg="#6c757d",
             fg="black",
@@ -100,14 +101,18 @@ class mainApp:
             csv_path = Path(__file__).parent / "data" / "streets_with_values.csv"
             df = pd.read_csv(csv_path, encoding="utf-8-sig")
             df = df.dropna(subset=["sensor_lat", "sensor_lon", "pm25"])
+
+            # Sensors
             sensors = df.drop_duplicates(subset=["sensor_id"]).sort_values(by="pm25", ascending=True)
 
-            sensor_data = []
+            # Save it as a state, don't draw
+            self.sensor_data = []
             for _, s in sensors.iterrows():
-                sensor_data.append((s["sensor_lat"], s["sensor_lon"], s["pm25"], s["sensor_name"]))
+                self.sensor_data.append((s["sensor_lat"], s["sensor_lon"], s["pm25"], s["sensor_name"]))
 
-            # Drawing must happen on the main thread
-            self.root.after(0, lambda: self.drawPollutionBySensor(sensor_data))
+            self.root.after(0, lambda: self.status_label.config(
+                text=f"Ready. {len(self.sensor_data)} sensors loaded. Click to set Point A."
+            ))
 
         except Exception as e:
             self.root.after(0, lambda: self.status_label.config(text=f"Loading error: {e}"))
@@ -124,47 +129,36 @@ class mainApp:
 
         for lat, lon, pm25, name in sensor_data:
             color = pm25_to_color(pm25)
-            delta_lat = RADIUS_METERS / 111320.0
-            delta_lon = RADIUS_METERS / (111320.0 * math.cos(math.radians(lat)))
-
-            circle_coords = []
-            for i in range(36):
-                angle = math.radians(i * 10)
-                circle_coords.append((
-                    lat + (delta_lat * math.cos(angle)),
-                    lon + (delta_lon * math.sin(angle)),
-                ))
-
-            poly = self.map_widget.set_polygon(
-                circle_coords,
-                fill_color="",
-                outline_color=color,
-                border_width=4,
-            )
-            self.pollution_layers.append(poly)
 
             marker = self.map_widget.set_marker(
                 lat, lon,
-                text=f'{name}\nPM2.5: {pm25}',
+                text=f'PM2.5: {pm25}',
                 marker_color_circle=color,
                 marker_color_outside=color,
+                text_color="black",  # <-- ДОДАЈ ГО ОВА (или која боја сакаш)
+                font=("Arial", 10, "normal")  # <-- ДОДАЈ ГО ОВА (normal наместо bold)
             )
             self.pollution_layers.append(marker)
 
-        self.status_label.config(text=f"Available sensors {len(sensor_data)}. Click to start.")
+        self.status_label.config(text=f"Pollution shown for {len(sensor_data)} sensors.")
 
     def togglePollution(self):
         if self.pollution_visible:
+            # Hide
             for layer in self.pollution_layers:
                 self.map_widget.delete(layer)
             self.pollution_layers.clear()
             self.pollution_visible = False
             self.debug_button.config(text="Show pollution (Debug)")
+            self.status_label.config(text="Pollution hidden.")
         else:
-            self.status_label.config(text="Re-rendering sensors...")
+            # Show (само ако се вчитани)
+            if not hasattr(self, 'sensor_data') or not self.sensor_data:
+                self.status_label.config(text="Sensors still loading, please wait...")
+                return
+            self.drawPollutionBySensor(self.sensor_data)
             self.pollution_visible = True
             self.debug_button.config(text="Hide pollution (Debug)")
-            threading.Thread(target=self.load_data_background, daemon=True).start()
 
     # ------------------------------------------------------------ routing
     def onMapClick(self, coords):
