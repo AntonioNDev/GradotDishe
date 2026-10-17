@@ -34,7 +34,7 @@ class mainApp:
         self.status_label.config(text="Loading map data and sensors... Please wait.")
         threading.Thread(target=self.load_data_background, daemon=True).start()
 
-    # ---------------------------------------------------------------- UI
+    # UI 
     def appDesign(self):
         self.top_panel = tk.Frame(self.root, bg="#f8f9fa", pady=10, padx=15)
         self.top_panel.pack(fill="x", side="top")
@@ -83,13 +83,20 @@ class mainApp:
         )
         self.reset_button.pack(side="right")
 
+        # Примерок за брза легенда во UI:
+        self.legend_frame = tk.Frame(self.top_panel, bg="#f8f9fa")
+        self.legend_frame.pack(side="left", padx=20)
+
+        legend_text = "🟢 <5 (Clear)   🟡 <15 (Medium pollution)   🔴 >25 (High pollution)"
+        tk.Label(self.legend_frame, text=legend_text, font=("Arial", 11, "bold"), bg="#f8f9fa", fg="#555").pack()
+
         self.map_widget = tkintermapview.TkinterMapView(self.root, width=900, height=650, corner_radius=0)
         self.map_widget.pack(fill="both", expand=True)
         self.map_widget.set_position(41.9981, 21.4254)
         self.map_widget.set_zoom(14)
         self.map_widget.add_left_click_map_command(self.onMapClick)
 
-    # ------------------------------------------------------ data loading
+    # data loading
     def load_data_background(self):
         """Runs on a background thread so the UI doesn't freeze."""
         try:
@@ -125,8 +132,6 @@ class mainApp:
             if v < 25:   return "#f97316"
             return "#dc2626"
 
-        RADIUS_METERS = 100
-
         for lat, lon, pm25, name in sensor_data:
             color = pm25_to_color(pm25)
 
@@ -160,7 +165,7 @@ class mainApp:
             self.pollution_visible = True
             self.debug_button.config(text="Hide pollution (Debug)")
 
-    # ------------------------------------------------------------ routing
+    # routing
     def onMapClick(self, coords):
         lat, lon = coords
 
