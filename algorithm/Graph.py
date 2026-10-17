@@ -98,11 +98,19 @@ def show(result):
     for i, (lat, lon) in enumerate(path):
         print(f"  {i}: {lat}, {lon}")
 
-BASE = Path(__file__).parent
-g = load_graph(BASE / "streets_with_values.csv")
+def find_route(g, start_latlon, end_latlon, alpha):
+    start = nearest_node(g, start_latlon[0], start_latlon[1])
+    goal = nearest_node(g, end_latlon[0], end_latlon[1])
+    result = dijkstra(g, start, goal, alpha)
+    if result is None:
+        return None
+    path, cost = result
+    return path
 
-start = nearest_node(g, 41.9945, 21.3270)
-goal = nearest_node(g, 41.9932, 21.3216)
-
-show(dijkstra(g, start, goal, alpha=0))
-show(dijkstra(g, start, goal, alpha=3))
+if __name__ == "__main__":
+    BASE = Path(__file__).parent
+    g = load_graph(BASE / "streets_with_values.csv")
+    start = nearest_node(g, 41.9945, 21.3270)
+    goal = nearest_node(g, 41.9932, 21.3216)
+    print(dijkstra(g, start, goal, alpha=0))
+    print(dijkstra(g, start, goal, alpha=3))

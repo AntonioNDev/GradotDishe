@@ -1,5 +1,7 @@
 import tkinter as tk
 import tkintermapview
+import algorithm.Graph as graph
+from pathlib import Path
 
 
 class mainApp:
@@ -18,6 +20,7 @@ class mainApp:
 
         # 3. Build UI Design (ПОВИКУВАЊЕ НА ДИЗАЈНОТ)
         self.appDesign()
+        self.graph = graph.load_graph(Path(__file__).parent / "algorithm" / "streets_with_values.csv")
 
     def appDesign(self):
         # Top Control Panel (UI Status & Controls)
@@ -78,16 +81,18 @@ class mainApp:
             self.end_coords = (lat, lon)
             self.marker_b = self.map_widget.set_marker(lat, lon, text="Point B")
             self.status_label.config(text="Calculating cleanest path...")
+            self.root.update_idletasks()
 
-            # ==================================================================
-            # ТУКА КОЛЕГАТА ЌЕ ЈА ПОВИКА ДАЈКСТРА ФУНКЦИЈАТА
-            # route_coordinates = dijkstra_func(self.start_coords, self.end_coords)
-            # ==================================================================
-            route_coordinates = None  # Привремено
+            route_coordinates = graph.find_route(
+                self.graph, self.start_coords, self.end_coords, alpha=3
+            )
 
             if route_coordinates:
                 self.drawPath(route_coordinates)
                 self.status_label.config(text="Path displayed successfully")
+            else:
+                self.status_label.config(text="No path found between these points")
+
 
     def drawPath(self, route_cords):
         """ Draws the returned path list on the map """
