@@ -9,3 +9,6 @@ Pillow>=10.0.0
 
 # HTTP Requests for API communication
 requests>=2.31.0
+
+# Pandas for CSV
+pandas>=3.0.6
