@@ -1,22 +1,25 @@
 import tkinter as tk
 import tkintermapview
+from pathlib import Path
+import algorithm.Graph as graph
 
 class mainApp:
    def __init__(self):
-      # 1. Initialization for the windows app
-      self.root = tk.Tk()
-      self.root.geometry("900x700")
-      self.root.title("Gradot Dishe")
+    # 1. Initialization for the windows app
+    self.root = tk.Tk()
+    self.root.geometry("900x700")
+    self.root.title("Gradot Dishe")
 
-      # 2. State Management
-      self.marker_a = None
-      self.marker_b = None
-      self.start_coords = None
-      self.end_coords = None
-      self.current_path = None
+    # 2. State Management
+    self.marker_a = None
+    self.marker_b = None
+    self.start_coords = None
+    self.end_coords = None
+    self.current_path = None
 
-      # 3. Build UI Design (ПОВИКУВАЊЕ НА ДИЗАЈНОТ)
-      self.appDesign()
+    # 3. Build UI Design (ПОВИКУВАЊЕ НА ДИЗАЈНОТ)
+    self.appDesign()
+    self.graph = graph.load_graph(Path(__file__).parent / "algorithm" / "streets_with_values.csv")
 
    def appDesign(self):
       # Top Control Panel (UI Status & Controls)
@@ -74,15 +77,20 @@ class mainApp:
 
       # Select Point B
       elif self.end_coords is None:
-         self.end_coords = (lat, lon)
-         self.marker_b = self.map_widget.set_marker(lat, lon, text="Point B")
-         self.status_label.config(text="Calculating cleanest path...")
+        self.end_coords = (lat, lon)
+        self.marker_b = self.map_widget.set_marker(lat, lon, text="Point B")
+        self.status_label.config(text="Calculating cleanest path...")
+        self.root.update_idletasks()
 
-         route_coordinates = None  # Привремено
+        route_coordinates = graph.find_route(
+            self.graph, self.start_coords, self.end_coords, alpha=3
+        )
 
-         if route_coordinates:
+        if route_coordinates:
             self.drawPath(route_coordinates)
             self.status_label.config(text="Path displayed successfully")
+        else:
+            self.status_label.config(text="No path found between these points")
 
    def drawPath(self, route_cords):
       """ Draws the returned path list on the map """
