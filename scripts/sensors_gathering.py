@@ -4,8 +4,8 @@ from datetime import datetime, timedelta, timezone
 import csv
 
 
-USERNAME = "alek123"
-PASSWORD = "321kela*"
+USERNAME = "PLACEHOLDER"
+PASSWORD = "PLACEHOLDER*"
 BASE_URL = "https://skopje.pulse.eco/rest"
 OUTPUT_CSV = "pm25_sensors.csv"
 

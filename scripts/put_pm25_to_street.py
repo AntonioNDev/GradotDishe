@@ -6,12 +6,15 @@ from datetime import datetime, timedelta, timezone
 import requests
 from requests.auth import HTTPBasicAuth
 
-USERNAME = "alek123"
+USERNAME = "PLACEHOLDER"
 PASSWORD = "PLACEHOLDER"
 BASE_URL = "https://skopje.pulse.eco/rest"
 OUTPUT_CSV = "pm25_sensors.csv"
-STREETS_WITH_SENSORS_CSV = "../data/streets_with_sensors.csv"
-STREETS_WITH_VALUES_CSV = "../data/streets_with_values.csv"
+from pathlib import Path
+
+BASE = Path(__file__).resolve().parent.parent
+STREETS_WITH_SENSORS_CSV = BASE / "data" / "streets_with_sensors.csv"
+STREETS_WITH_VALUES_CSV = BASE / "data" / "streets_with_values.csv"
 CACHE_TTL_SECONDS = 30 * 60   # 30 мин
 
 auth = HTTPBasicAuth(USERNAME, PASSWORD)
@@ -139,7 +142,7 @@ def build_streets_with_values():
 
     # 3. запиши (атомарно преку .tmp)
     fieldnames = list(dict.fromkeys(list(streets[0].keys()) + ["pm25", "pm25_timestamp"]))
-    tmp_path = STREETS_WITH_VALUES_CSV + ".tmp"
+    tmp_path = STREETS_WITH_VALUES_CSV.with_suffix(".csv.tmp")
 
     with open(tmp_path, "w", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)

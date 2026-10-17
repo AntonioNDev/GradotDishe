@@ -102,7 +102,7 @@ class mainApp:
         try:
             # Load the routing graph only once
             if self.graph is None:
-                self.graph = graph.load_graph(Path(__file__).parent / "algorithm" / "streets_with_values.csv")
+                self.graph = graph.load_graph(Path(__file__).parent / "data" / "streets_with_values.csv")
 
             # Read sensors for the pollution circles
             csv_path = Path(__file__).parent / "data" / "streets_with_values.csv"
@@ -243,5 +243,9 @@ class mainApp:
 
 
 if __name__ == "__main__":
+    from scripts.put_pm25_to_street import main
+    main()
+
     app = mainApp()
     app.main()
+

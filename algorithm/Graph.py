@@ -289,8 +289,8 @@ def show(result):
 
 
 if __name__ == "__main__":
-    BASE = Path(__file__).parent
-    g = load_graph(BASE / "streets_with_values.csv")
+    BASE = Path(__file__).parent.parent
+    g = load_graph(BASE / "data" / "streets_with_values.csv")
     res = find_routes(g, (41.9945, 21.3270), (41.9932, 21.3216))
     if res:
         for name in ("shortest", "clean"):
