@@ -10,29 +10,31 @@ class mainApp:
       root.title("Gradot Dishe")
 
       # Creation of the Widgit map
-      map_widget = tkintermapview.TkinterMapView(root, width=900, height=700, corner_radius=0)
+      map_widget = tkintermapview.TkinterMapView(root, size, corner_radius=0)
       map_widget.pack(fill="both", expand=True)
-
+      
       # Center the map for Skopje (temporary situation)
       map_widget.set_position(41.9981, 21.4254) # Skopje lt, alt
       map_widget.set_zoom(14)
 
       # Temporary setting points A to B
-      marker_a = map_widget.set_marker(41.9981, 21.4254, text="Точка А (Центар)")
-      marker_b = map_widget.set_marker(42.0020, 21.4090, text="Точка Б (Карпош)")
+      marker_a = None
+      marker_b = None
 
-      # list of test cordinates 
-      route_coordinates = [
-         (41.9981, 21.4254),
-         (41.9995, 21.4180),
-         (42.0020, 21.4090)
-      ]
-
-      # Drawing of the shortest and cleanest path
-      path = map_widget.set_path(route_coordinates, color="#2ea44f", width=5)
+      # list of route cordinates 
+      route_coordinates = list()
 
       # START APP
       root.mainloop()
+
+   def drawPath(route_cords, map_widget):
+      """ Drawing of the shortest and cleanest path 
+      
+          route_cords: list of cordinates from A to B location
+          map_widget: tkintermapview for the interactive map
+      """
+
+      path = map_widget.set_path(route_cords, color="#2ea44f", width=5)
 
 
 if __name__ == "__main__":
