@@ -7,7 +7,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 USERNAME = "alek123"
-PASSWORD = "novaNOVA"
+PASSWORD = "PLACEHOLDER"
 BASE_URL = "https://skopje.pulse.eco/rest"
 OUTPUT_CSV = "pm25_sensors.csv"
 STREETS_WITH_SENSORS_CSV = "../data/streets_with_sensors.csv"
