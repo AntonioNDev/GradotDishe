@@ -87,7 +87,7 @@ class mainApp:
         self.legend_frame = tk.Frame(self.top_panel, bg="#f8f9fa")
         self.legend_frame.pack(side="left", padx=20)
 
-        legend_text = "🟢 <5 (Clear)   🟡 <15 (Medium pollution)   🔴 >25 (High pollution)"
+        legend_text = "🟢 <5 (Clear)   🟡 <15 (Medium pollution)   🔴 >25(High pollution)"
         tk.Label(self.legend_frame, text=legend_text, font=("Arial", 11, "bold"), bg="#f8f9fa", fg="#555").pack()
 
         self.map_widget = tkintermapview.TkinterMapView(self.root, width=900, height=650, corner_radius=0)
