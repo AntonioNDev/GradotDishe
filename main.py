@@ -364,8 +364,12 @@ class MainApp:
         self.map_holder.pack(fill="both", expand=True)
         self.root.update_idletasks()  # the map needs the real widget size before it draws
 
-        self.map_widget = tkintermapview.TkinterMapView(self.map_holder, width=1000,
-                                                        height=600, corner_radius=0)
+        self.map_widget = tkintermapview.TkinterMapView(
+            self.map_holder, width=1000, height=600, corner_radius=0
+        )
+
+        self.map_widget.set_tile_server("https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22) # <- promena
+
         self.map_widget.pack(fill="both", expand=True)
         self.map_widget.set_position(*START_POS)
         self.map_widget.set_zoom(START_ZOOM)
